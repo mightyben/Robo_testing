@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoboTools Admin Command Center</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --cyber-bg: #060212;
+            --panel-bg: #120b2e;
+            --neon-orange: #ff5e00;
+            --neon-pink: #ff0055;
+            --neon-blue: #00f3ff;
+        }
+
+        body {
+            background-color: var(--cyber-bg);
+            color: #ffffff;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            padding-bottom: 40px;
+        }
+
+        .admin-nav {
+            background-color: #000000;
+            border-bottom: 2px solid #22164e;
+            padding: 15px;
+        }
+
+        .stat-card {
+            background-color: var(--panel-bg);
+            border: 1px solid #2a1f5c;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+
+        .custom-table {
+            background-color: var(--panel-bg);
+            border: 1px solid #2a1f5c;
+            color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .custom-table th {
+            background-color: #1a103c;
+            color: var(--neon-blue);
+            border-bottom: 2px solid #2a1f5c;
+            padding: 12px;
+        }
+
+        .custom-table td {
+            border-bottom: 1px solid #1a103c;
+            padding: 12px;
+            vertical-align: middle;
+        }
+
+        .btn-back {
+            background: linear-gradient(135deg, var(--neon-orange), var(--neon-pink));
+            border: none;
+            color: white;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="admin-nav d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center gap-2">
+            <a href="index.html" style="
+position: fixed;
+top: 15px;
+left: 15px;
+display: inline-flex;
+align-items: center;
+justify-content: center;
+width: 42px;
+height: 42px;
+background: rgba(255,255,255,0.15);
+backdrop-filter: blur(5px);
+border: 1px solid rgba(255,255,255,0.3);
+border-radius: 50%;
+color: #fff;
+font-size: 22px;
+text-decoration: none;
+box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+transition: 0.3s;
+z-index: 9999;"
+onmouseover="this.style.background='rgba(255,255,255,0.3)'"
+onmouseout="this.style.background='rgba(255,255,255,0.15)'"
+title="Back to Home">🏠</a>
+            <span style="font-size: 1.4rem;">🛡️</span>
+            <span class="fw-bold text-uppercase tracking-wider" style="color: var(--neon-blue);">Admin Control Deck</span>
+        </div>
+        <button class="btn btn-back btn-sm px-3" onclick="location.href='../index.html'">
+            <i class="fa-solid fa-arrow-left me-1"></i> Hub Menu
+        </button>
+    </nav>
+
+    <div class="container px-3">
+        
+        <div class="row g-3 mb-4">
+            <div class="col-6">
+                <div class="stat-card text-center">
+                    <h6 class="text-muted text-uppercase small mb-1">Total Onboarded</h6>
+                    <h2 id="totalUsersCount" class="fw-bold text-white"><i class="fa-solid fa-spinner fa-spin fs-4"></i></h2>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="stat-card text-center">
+                    <h6 class="text-muted text-uppercase small mb-1">Active Database Connection</h6>
+                    <h2 class="fw-bold text-success" style="font-size: 1.5rem;"><i class="fa-solid fa-circle-check"></i> LIVE</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold m-0"><i class="fa-solid fa-users me-2 text-info"></i> User Directory Matrix</h5>
+                <button class="btn btn-outline-info btn-sm" onclick="fetchUserDirectory()">
+                    <i class="fa-solid fa-rotate"></i> Refresh
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table custom-table m-0">
+                    <thead>
+                        <tr>
+                            <th>Telegram ID</th>
+                            <th>Username</th>
+                            <th>First Name</th>
+                            <th>Last Active</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">
+                                <i class="fa-solid fa-circle-notch fa-spin me-2"></i> Querying record sets...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        // CONFIGURATION MATCHING YOUR CHOSEN MASTER SETTINGS
+        const SUPABASE_URL = "https://cwkpircsbjusnvvjaybp.supabase.co"; 
+        const SUPABASE_ANON_KEY = "sb_publishable_R7jAQ8ef0TDejRZvEx01vA_8lFePNTD"; 
+        const MASTER_ADMIN_ID = 123456789; 
+
+        // Initialize connection interface
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            // Strict Verification: Ensure URL can't be guessed by non-admins
+            if (window.Telegram && window.Telegram.WebApp) {
+                const tg = window.Telegram.WebApp;
+                tg.ready();
+                
+                const currentUserId = tg.initDataUnsafe?.user?.id;
+
+                if (currentUserId !== MASTER_ADMIN_ID) {
+                    // Instantly kick out intruders back to the main ecosystem screen
+                    alert("Unauthorized Admin Signature. Access Terminal Closed.");
+                    window.location.href = "../index.html";
+                    return;
+                }
+                
+                // If ID matches perfectly, run database fetch routines
+                await fetchAnalytics();
+                await fetchUserDirectory();
+            }
+        });
+
+        // FETCH SUMMARY COUNTS
+        async function fetchAnalytics() {
+            try {
+                const { count, error } = await supabase
+                    .from('users')
+                    .select('*', { count: 'exact', head: true });
+
+                if (!error) {
+                    document.getElementById('totalUsersCount').innerText = count;
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // QUERY ROW ITEMS DIRECT FROM SUPABASE
+        async function fetchUserDirectory() {
+            const tableBody = document.getElementById('userTableBody');
+            
+            try {
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .order('last_seen_at', { ascending: false });
+
+                if (error) throw error;
+
+                if (data.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="4" class="text-center text-muted">No records found.</td></tr>`;
+                    return;
+                }
+
+                tableBody.innerHTML = ""; // Clear loader string
+                data.forEach(user => {
+                    const formattedDate = new Date(user.last_seen_at).toLocaleDateString(undefined, {
+                        month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'
+                    });
+
+                    tableBody.innerHTML += `
+                        <tr>
+                            <td class="font-monospace text-warning">${user.telegram_id}</td>
+                            <td>${user.username ? '@' + user.username : '<span class="text-muted">None</span>'}</td>
+                            <td>${user.first_name}</td>
+                            <td class="small text-muted">${formattedDate}</td>
+                        </tr>
+                    `;
+                });
+
+            } catch (err) {
+                tableBody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">Data access error. Check API credentials.</td></tr>`;
+            }
+        }
+    </script>
+</body>
+</html>
