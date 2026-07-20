@@ -1,0 +1,347 @@
+:root {
+    --bg-dark: #0a051b;
+    --cyber-bg: #050212;
+    --panel-bg: rgba(14, 8, 38, 0.9);
+    --card-bg: #120b2e;
+    --neon-blue: #00f3ff;
+    --neon-purple: #bd00ff;
+    --neon-pink: #ff0055;
+    --neon-green: #00ff66;
+    --neon-orange: #ff5e00;
+    --text-light: #ffffff;
+    --terminal-glow: rgba(0, 243, 255, 0.15);
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    touch-action: manipulation;
+}
+
+/* Header Adjustments */
+.custom-header {
+    background-color: #060212;
+    border-bottom: 2px solid #1a123a;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    padding: 10px 15px;
+}
+
+.user-welcome-badge {
+    font-size: 0.85rem;
+    background: linear-gradient(135deg, rgba(0, 243, 255, 0.1), rgba(189, 0, 255, 0.1));
+    border: 1px solid #2a1f5c;
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+/* Search Controls */
+.search-container {
+    max-width: 500px;
+    margin: 12px auto;
+    width: 100%;
+}
+
+.search-container .form-control {
+    background-color: #160e36;
+    border: 1px solid #2a1f5c;
+    color: var(--text-light);
+}
+
+.search-container .form-control:focus {
+    background-color: #1c1244;
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 8px rgba(0, 243, 255, 0.5);
+    color: var(--text-light);
+}
+
+.search-container .input-group-text {
+    background-color: #160e36;
+    border: 1px solid #2a1f5c;
+    color: #8a7eb5;
+}
+
+.logo-text {
+    font-weight: 800;
+    letter-spacing: 1px;
+    background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.logo-icon {
+    color: var(--neon-blue);
+    text-shadow: 0 0 8px var(--neon-blue);
+}
+
+/* Grid & Cards Layout */
+.section-title {
+    font-weight: 700;
+    letter-spacing: 2px;
+    font-size: 1.25rem;
+    color: #e2e0e6;
+}
+
+.row.g-2 {
+    margin-top: 10px;
+}
+
+.tool-card {
+    background-color: var(--card-bg);
+    border: 1px solid #22164e;
+    border-radius: 12px;
+    padding: 12px 5px;
+    text-align: center;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.tool-card:active {
+    transform: scale(0.96);
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 12px rgba(0, 243, 255, 0.3);
+}
+
+/* Secret Drawer Card Variants */
+.tool-card.secret-style {
+    border-color: #3d0c5a;
+    background: radial-gradient(circle at center, #190a33 0%, #120b2e 100%);
+}
+.tool-card.secret-style:active {
+    border-color: var(--neon-purple);
+    box-shadow: 0 0 12px rgba(189, 0, 255, 0.4);
+}
+
+/* Custom Image Logos */
+.app-logo {
+    width: 55px;
+    height: 55px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin: 0 auto 8px auto;
+    display: block;
+    background-color: #000;
+}
+
+.neon-blue-border { box-shadow: 0 0 10px rgba(0, 243, 255, 0.4); border: 2px solid var(--neon-blue); }
+.neon-purple-border { box-shadow: 0 0 10px rgba(189, 0, 255, 0.4); border: 2px solid var(--neon-purple); }
+
+.tool-title {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #dedede;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+
+.badge-container {
+    position: absolute;
+    top: -10px;
+    right: 10px;
+    z-index: 2;
+}
+
+.custom-badge {
+    font-size: 0.65rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+.disabled-opacity {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Security Screening & Terminal Layers */
+.security-screen-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--cyber-bg);
+    background-image: 
+        linear-gradient(rgba(18, 11, 46, 0.4) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(18, 11, 46, 0.4) 1px, transparent 1px);
+    background-size: 20px 20px;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+}
+
+.terminal-panel {
+    background: var(--panel-bg);
+    border: 1px solid #2a1f5c;
+    box-shadow: 0 0 30px var(--terminal-glow), inset 0 0 15px rgba(189, 0, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 30px 24px;
+    width: 100%;
+    max-width: 340px;
+    position: relative;
+    overflow: hidden;
+}
+
+.terminal-panel::after {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 243, 255, 0.04) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+    z-index: 2;
+    background-size: 100% 3px, 6px 100%;
+    pointer-events: none;
+}
+
+.splash-logo {
+    width: 140px;
+    height: 140px;
+    object-fit: contain;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 10px rgba(0, 243, 255, 0.4));
+}
+
+/* Biometric Sensor Layout */
+.biometric-scanner-frame {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 25px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.biometric-scanner-btn {
+    background: radial-gradient(circle, #1a0e3d 0%, #060212 100%);
+    border: 2px solid var(--neon-blue);
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    color: var(--neon-blue);
+    font-size: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 5;
+}
+
+.biometric-scanner-btn:active {
+    transform: scale(0.94);
+    box-shadow: 0 0 30px var(--neon-blue);
+    color: #ffffff;
+}
+
+.pulse-ring {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    border: 2px solid var(--neon-purple);
+    border-radius: 50%;
+    animation: circuitPulse 2s infinite linear;
+    opacity: 0;
+    pointer-events: none;
+}
+
+@keyframes circuitPulse {
+    0% { transform: scale(0.85); opacity: 0.8; }
+    100% { transform: scale(1.15); opacity: 0; }
+}
+
+/* Security Pattern Grid */
+#patternCanvas {
+    background-color: #09051c;
+    border: 1px solid #2a1f5c;
+    border-radius: 16px;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.6);
+    touch-action: none;
+    display: block;
+    margin: 0 auto;
+}
+
+.security-option-card {
+    background: rgba(18, 11, 46, 0.6);
+    border: 1px solid #22164e;
+    border-radius: 14px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+.security-option-card:active {
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+    transform: scale(0.97);
+}
+
+/* Modals & Interstitials appearance */
+.ad-modal-content {
+    background-color: #120b2e;
+    border: 2px solid var(--neon-purple);
+    color: var(--text-light);
+    border-radius: 20px;
+    text-align: center;
+}
+
+.custom-modal-content {
+    background-color: #0f0a2a;
+    border: 2px solid #291a5c;
+    color: white;
+    text-align: center;
+}
+
+.custom-progress-track {
+    background-color: #1b1141;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.custom-progress-bar {
+    background: linear-gradient(90deg, var(--neon-purple), var(--neon-pink));
+    width: 0%;
+    height: 100%;
+}
+
+/* Administrative Entry Trigger Badge */
+.admin-floating-trigger {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, var(--neon-orange), var(--neon-pink));
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 15px rgba(255, 94, 0, 0.4);
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.3rem;
+    z-index: 9999;
+}
