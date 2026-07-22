@@ -3,303 +3,1007 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>3D Mobile FPS - Step 6 (Centered Hands)</title>
+    <title>ROBO WORK SHOP Ecosystem Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="css/style.css">
+
     <style>
-        body { margin: 0; padding: 0; overflow: hidden; background-color: #111; user-select: none; -webkit-user-select: none; }
-        canvas { width: 100vw; height: 100vh; display: block; }
-        #multiplayer-ui { position: absolute; top: 10px; left: 10px; background: rgba(0, 0, 0, 0.7); color: white; padding: 10px; border-radius: 8px; font-family: sans-serif; font-size: 12px; z-index: 20; max-width: 280px; }
-        #multiplayer-ui input { width: 120px; font-size: 11px; }
-        #multiplayer-ui button { font-size: 11px; margin-left: 5px; }
-        #joystick-zone { position: absolute; bottom: 40px; left: 40px; width: 120px; height: 120px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; touch-action: none; display: flex; align-items: center; justify-content: center; z-index: 10; border: 1px solid rgba(255,255,255,0.2); }
-        #joystick-knob { width: 50px; height: 50px; background: rgba(255, 255, 255, 0.5); border-radius: 50%; position: relative; pointer-events: none; }
-        #fire-button { position: absolute; bottom: 60px; right: 40px; width: 90px; height: 90px; background: rgba(255, 50, 50, 0.6); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%; text-align: center; line-height: 86px; color: white; font-family: sans-serif; font-weight: bold; font-size: 20px; touch-action: none; z-index: 10; box-shadow: 0 0 10px rgba(255, 0, 0, 0.3); }
-        #fire-button:active { background: rgba(255, 0, 0, 0.8); transform: scale(0.95); }
-        #crosshair { position: absolute; top: 50%; left: 50%; width: 14px; height: 14px; transform: translate(-50%, -50%); pointer-events: none; z-index: 10; }
-        #crosshair::before, #crosshair::after { content: ''; position: absolute; background: white; }
-        #crosshair::before { top: 6px; left: 0; width: 14px; height: 2px; }
-        #crosshair::after { left: 6px; top: 0; width: 2px; height: 14px; }
+        :root {
+            --primary-accent: #2563eb; /* Professional Blue */
+            --primary-hover: #1d4ed8;
+            --bg-main: #f4f7f9;
+            --card-bg: #ffffff;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --border-light: #e2e8f0;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* --- MATURE & CLEAN HEADER --- */
+        .pro-header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 12px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+
+        /* Overriding inline dark text styles for the new light header */
+        .pro-header .text-white {
+            color: var(--text-dark) !important;
+            text-shadow: none !important;
+        }
+        .pro-header span[style*="color: #00f3ff"] {
+            color: var(--primary-accent) !important;
+        }
+
+        /* --- MATURE & CLEAN FOOTER --- */
+        .pro-footer {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 12px 10px;
+            padding-bottom: env(safe-area-inset-bottom, 12px);
+            box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.05);
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+        }
+
+        .footer-icon {
+            color: #94a3b8;
+            font-size: 1.3rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+        }
+
+        .footer-icon.active, .footer-icon:active, .footer-icon:hover {
+            color: var(--primary-accent);
+            text-shadow: none;
+            transform: translateY(-4px) scale(1.05);
+        }
+
+        .footer-icon span {
+            font-size: 0.65rem;
+            font-family: inherit;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: inherit;
+        }
+
+        /* Adjust main area so footer doesn't hide content */
+        main.content-area {
+            padding-bottom: 100px !important;
+            padding-top: 25px;
+        }
+
+        /* --- ELEGANT APP CARDS --- */
+        .tool-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-light);
+            border-radius: 20px;
+            padding: 18px 10px;
+            text-align: center;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            cursor: pointer;
+        }
+
+        .tool-card:hover, .tool-card:active {
+            border-color: #bfdbfe;
+            box-shadow: 0 12px 25px rgba(37, 99, 235, 0.08);
+            transform: translateY(-5px) scale(1.02);
+        }
+
+        .tool-card.secret-style {
+            border: 1px dashed #c084fc;
+            background: #faf5ff;
+        }
+        
+        .tool-card.secret-style:hover, .tool-card.secret-style:active {
+            border-color: #a855f7;
+            box-shadow: 0 12px 25px rgba(168, 85, 247, 0.12);
+        }
+
+        .app-logo {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            margin-bottom: 12px;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.06));
+            transition: transform 0.3s ease;
+        }
+        
+        .tool-title {
+            font-size: 0.75rem;
+            color: var(--text-dark);
+            margin: 0;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: 0.3px;
+        }
+
+        /* --- REFINED HOT BADGE --- */
+        .hot-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: linear-gradient(135deg, #ef4444, #f97316);
+            color: white;
+            font-size: 0.6rem;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.25);
+            border: 2px solid white;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        /* --- POP ANIMATION UPDATE --- */
+        .pop-click {
+            animation: popAnimation 0.35s ease forwards;
+        }
+
+        @keyframes popAnimation {
+            0% { transform: scale(1); }
+            40% { transform: scale(0.92); opacity: 0.9; }
+            100% { transform: scale(1.08); box-shadow: 0 15px 30px rgba(37, 99, 235, 0.15); z-index: 50; }
+        }
+
+        /* --- SECURITY SCREENS (MATURE UI) --- */
+        .security-screen-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(244, 247, 249, 0.95);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .terminal-panel {
+            background: var(--card-bg);
+            padding: 30px 25px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-light);
+            text-align: center;
+            width: 90%;
+            max-width: 380px;
+        }
+
+        .biometric-scanner-frame {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 25px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pulse-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(37, 99, 235, 0.1);
+            animation: pulseSoft 2s infinite;
+        }
+
+        @keyframes pulseSoft {
+            0% { transform: scale(0.8); opacity: 0.8; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        .biometric-scanner-btn {
+            font-size: 3.5rem;
+            color: var(--primary-accent);
+            cursor: pointer;
+            z-index: 2;
+            transition: all 0.3s ease;
+            background: white;
+            border-radius: 50%;
+            width: 80px; height: 80px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.15);
+        }
+
+        .biometric-scanner-btn:active {
+            transform: scale(0.9);
+        }
+
+        .security-option-card {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 16px;
+            border: 1px solid var(--border-light);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .security-option-card:hover {
+            border-color: var(--primary-accent);
+            background: #eff6ff;
+            transform: translateY(-2px);
+        }
+
+        /* --- MODAL LOADING BAR (MATURE) --- */
+        .custom-progress-track {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 6px;
+            width: 100%;
+            overflow: hidden;
+        }
+        .custom-progress-bar {
+            background: var(--primary-accent);
+            height: 100%;
+            width: 0%;
+            transition: width 1s linear;
+        }
+        .custom-modal-content {
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        /* Floating Admin Badge override */
+        .admin-floating-trigger {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 45px; height: 45px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-light);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-accent);
+            z-index: 900;
+            cursor: pointer;
+        }
     </style>
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <script src='//libtl.com/sdk.js' data-zone='11348363' data-sdk='show_11348363'></script>
 </head>
 <body>
 
-    <div id="multiplayer-ui">
-        <div>Status: <span id="network-status" style="color: #ffa500;">Connecting...</span></div>
-        <div style="margin-top: 5px;">Your ID: <span id="my-id" style="font-weight:bold; color:#2ed573;">...</span></div>
-        <div style="margin-top: 5px;">
-            <input type="text" id="peer-id-input" placeholder="Paste Friend ID">
-            <button id="connect-btn">Connect</button>
+    <div id="splashLayer" class="security-screen-overlay">
+        <img src="tools/img/heading.png" class="splash-logo" alt="RoboWorkShop" style="filter: drop-shadow(0 4px 10px rgba(0,0,0,0.1));">
+        <h4 class="fw-bold text-uppercase tracking-wider mt-3" style="color: var(--primary-accent); font-size: 1.1rem; letter-spacing: 1px;">System Operational</h4>
+        <div class="spinner-border spinner-border-sm mt-2" style="color: var(--primary-accent);" role="status"></div>
+    </div>
+
+    <div id="fingerprintLockLayer" class="security-screen-overlay" style="display: none;">
+        <div class="terminal-panel">
+            <div class="mb-2">
+                <h5 class="fw-bold m-0 text-dark">Security Lock</h5>
+                <p class="text-muted small m-0 mt-1">Scan terminal biometric matrix</p>
+            </div>
+            
+            <div class="biometric-scanner-frame">
+                <div class="pulse-ring"></div>
+                <div class="biometric-scanner-btn" onclick="authenticateViaBiometrics()">
+                    <i class="fa-solid fa-fingerprint"></i>
+                </div>
+            </div>
+            
+            <div id="biometricStatusFeedback" class="small fw-bold" style="color: var(--primary-accent);">Sensor node standby...</div>
         </div>
     </div>
 
-    <div id="crosshair"></div>
-    <div id="joystick-zone"><div id="joystick-knob"></div></div>
-    <div id="fire-button">FIRE</div>
+    <div id="patternLockLayer" class="security-screen-overlay" style="display: none;">
+        <div class="terminal-panel">
+            <div class="mb-3">
+                <h5 id="patternLockHeader" class="fw-bold m-0 text-dark">Security Signature</h5>
+                <p id="patternLockSubheader" class="text-muted small m-0 mt-1">Connect to verify authority</p>
+            </div>
+            
+            <canvas id="patternCanvas" width="260" height="260" style="margin: 0 auto; display: block;"></canvas>
+            
+            <button class="btn btn-sm w-100 mt-4 text-uppercase fw-bold" style="font-size:0.75rem; border: 1px solid #e2e8f0; background: #f8fafc; color: #64748b; border-radius: 10px; padding: 10px;" onclick="resetPatternRegistrationState()">
+                Clear Pattern Buffer
+            </button>
+        </div>
+    </div>
 
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
-            }
+    <div id="securityOnboardingLayer" class="security-screen-overlay" style="display: none;">
+        <div class="terminal-panel">
+            <div class="mb-4">
+                <h5 class="fw-bold text-dark m-0">Initialize Security</h5>
+                <p class="text-muted small m-0 mt-1">Select authentication method for this workspace</p>
+            </div>
+            
+            <div class="d-flex flex-column gap-3 w-100">
+                <div class="security-option-card d-flex align-items-center gap-3 text-start" onclick="setupOnboardingSecurity('fingerprint')">
+                    <div style="background: white; padding: 10px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                        <i class="fa-solid fa-fingerprint fa-2x" style="color: var(--primary-accent);"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold m-0 text-dark">Biometrics Node</h6>
+                        <small class="text-muted d-block" style="font-size:0.75rem;">Use local device sensory scanner</small>
+                    </div>
+                </div>
+                
+                <div class="security-option-card d-flex align-items-center gap-3 text-start" onclick="setupOnboardingSecurity('pattern')">
+                    <div style="background: white; padding: 10px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                        <i class="fa-solid fa-network-wired fa-2x" style="color: #6366f1;"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold m-0 text-dark">Matrix Layout</h6>
+                        <small class="text-muted d-block" style="font-size:0.75rem;">Configure sequential grid linking</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Polished Premium Glowing Header -->
+    <header class="pro-header d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
+            <span id="ogSecretTrigger" style="font-size: 1.4rem; cursor: pointer; user-select: none; transition: transform 0.3s ease;" title="Toggle Operations Grid">👻</span>
+            <span class="fw-bold tracking-wider text-white" style="font-size: 1.1rem;">ROBO <span style="color: #00f3ff;">PREMIUM</span></span>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <button class="btn btn-sm rounded-circle d-flex justify-content-center align-items-center" style="width: 36px; height: 36px; background: #f8fafc; border: 1px solid #e2e8f0; box-shadow: 0 2px 5px rgba(0,0,0,0.05);" onclick="triggerSecuritySettingsReset()" title="Reset Configuration Parameters">
+                <i class="fa-solid fa-shield-halved text-primary" style="font-size: 0.9rem;"></i>
+            </button>
+            <div id="userProfileDisplay" class="user-welcome-badge text-center small fw-bold" style="background: #eff6ff; padding: 6px 14px; border-radius: 20px; border: 1px solid #bfdbfe; color: #1d4ed8; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);">
+                Connecting...
+            </div>
+        </div>
+    </header>
+
+    <main class="container px-3 flex-grow-1 content-area">
+        <div class="search-container mb-4 mt-2">
+            <div class="input-group" style="box-shadow: 0 4px 20px rgba(0,0,0,0.04); border-radius: 16px; overflow: hidden; border: 1px solid var(--border-light);">
+                <span class="input-group-text" style="background: #f8fafc; border: none; border-right: 1px solid var(--border-light); color: #94a3b8;"><i class="fas fa-search"></i></span>
+                <input type="text" id="toolSearch" class="form-control" placeholder="Search operational programs..." style="background: #ffffff; border: none; color: var(--text-dark); padding: 12px 15px; box-shadow: none;">
+            </div>
+        </div>
+
+        <div class="row g-3" id="matrixContainer">
+            <!-- VISIBLE PUBLIC TOOLS -->
+            <div class="col-4 col-sm-3 tool-card-wrapper" data-name="background remover transparent image bg">
+                <div class="tool-card" onclick="requestAppLaunch('bg_remover.html', this)">
+                    <img src="tools/img/bg_remover.png" class="app-logo" alt="BG Remover">
+                    <h3 class="tool-title">BG Remover</h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper" data-name="fake call phone simulate prank">
+                <div class="tool-card" onclick="requestAppLaunch('fk_call.html', this)">
+                    <img src="tools/img/fk_call.png" class="app-logo" alt="FK Call">
+                    <h3 class="tool-title">Fake Call</h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper" data-name="world clock timezone display regional region time map">
+                <div class="tool-card" onclick="requestAppLaunch('global_clock.html', this)">
+                    <img src="tools/img/global_clock.png" class="app-logo" alt="Clock">
+                    <h3 class="tool-title">Global Clock</h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper" data-name="image converter extension format type convert">
+                <div class="tool-card" onclick="requestAppLaunch('image_converter.html', this)">
+                    <img src="tools/img/image_converter.png" class="app-logo" alt="Img Converter">
+                    <h3 class="tool-title">Image Convert</h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper" data-name="image animation live engine photo movement effect">
+                <div class="tool-card" onclick="requestAppLaunch('image_effect.html', this)">
+                    <img src="tools/img/image_effect.png" class="app-logo" alt="Img Effect">
+                    <h3 class="tool-title">Image Effect</h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper" data-name="fake license identity generator card passport">
+                <div class="tool-card" onclick="requestAppLaunch('linsence_gen.html', this)">
+                    <img src="tools/img/linsence_gen.png" class="app-logo" alt="License Gen">
+                    <h3 class="tool-title">FK License Gen</h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper" data-name="list cleaner organize sort remove text">
+                <div class="tool-card" onclick="requestAppLaunch('list_cleaner.html', this)">
+                    <img src="tools/img/system_cleaner.png" class="app-logo" alt="List Cleaner">
+                    <h3 class="tool-title">List Cleaner</h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper" data-name="logo maker premium vector badge emblem">
+                <div class="tool-card" onclick="requestAppLaunch('logo_creator.html', this)">
+                    <img src="tools/img/logo_creator.png" class="app-logo" alt="Logo">
+                    <h3 class="tool-title">Logo Creator</h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper" data-name="metadata remover stripping exif security privacy data">
+                <div class="tool-card" onclick="requestAppLaunch('metadata_remover.html', this)">
+                    <img src="tools/img/metadata_remover.png" class="app-logo" alt="Meta Remover">
+                    <h3 class="tool-title">Meta Remover</h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper" data-name="office suite document reader text word sheet pad view">
+                <div class="tool-card" onclick="requestAppLaunch('office_suite.html', this)">
+                    <img src="tools/img/office_suite.png" class="app-logo" alt="Office">
+                    <h3 class="tool-title">Office Suite</h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper" data-name="fake receipt bill payment success invoice screenshot">
+                <div class="tool-card" onclick="requestAppLaunch('pmt_success.html', this)">
+                    <div class="hot-badge"><i class="fa-solid fa-fire"></i> HOT</div>
+                    <img src="tools/img/pmt_success.png" class="app-logo" alt="PMT">
+                    <h3 class="tool-title">PMT Success</h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper" data-name="fake video call prank frame camera studio">
+                <div class="tool-card" onclick="requestAppLaunch('prank_camera_studio.html', this)">
+                    <img src="tools/img/prank_camera_studio.png" class="app-logo" alt="Camera Studio">
+                    <h3 class="tool-title">Video Prank</h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper" data-name="qr code generator studio scan maker">
+                <div class="tool-card" onclick="requestAppLaunch('qr_studio.html', this)">
+                    <img src="tools/img/qr_studio.png" class="app-logo" alt="QR Studio">
+                    <h3 class="tool-title">QR Builder</h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper" data-name="fake receipt bill layout invoice maker">
+                <div class="tool-card" onclick="requestAppLaunch('receipt_gen.html', this)">
+                    <img src="tools/img/receipt_gen.png" class="app-logo" alt="Receipt">
+                    <h3 class="tool-title">Receipt Gen</h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper" data-name="file cleaner utility scan deep duplicate">
+                <div class="tool-card" onclick="requestAppLaunch('system_cleaner.html', this)">
+                    <img src="tools/img/system_cleaner.png" class="app-logo" alt="Cleaner">
+                    <h3 class="tool-title">File Cleaner</h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper" data-name="voice to text audio recording transcripts mic">
+                <div class="tool-card" onclick="requestAppLaunch('text2voice.html', this)">
+                    <div class="hot-badge"><i class="fa-solid fa-fire"></i> HOT</div>
+                    <img src="tools/img/text2voice.png" class="app-logo" alt="Text2Voice">
+                    <h3 class="tool-title">Text2Voice</h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper" data-name="fake receipt bill layout invoice maker secret message coder">
+                <div class="tool-card" onclick="requestAppLaunch('text_coder.html', this)">
+                    <div class="hot-badge"><i class="fa-solid fa-fire"></i> HOT</div>
+                    <img src="tools/img/text_coder.png" class="app-logo" alt="Text Coder">
+                    <h3 class="tool-title">Text Coder</h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper" data-name="fake call phone simulate prank voice transformer">
+                <div class="tool-card" onclick="requestAppLaunch('voice_transformer.html', this)">
+                    <img src="tools/img/voice_transformer.png" class="app-logo" alt="Voice Transform">
+                    <h3 class="tool-title">Voice Transform</h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper" data-name="workspace hub environment ecosystem">
+                <div class="tool-card" onclick="requestAppLaunch('workspace_hub.html', this)">
+                    <img src="tools/img/workspace_hub.png" class="app-logo" alt="Workspace">
+                    <h3 class="tool-title">Workspace Hub</h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper" data-name="zip file extractor compress unrar rar archive">
+                <div class="tool-card" onclick="requestAppLaunch('zip_suite.html', this)">
+                    <img src="tools/img/zip.png" class="app-logo" alt="Zip Suite">
+                    <h3 class="tool-title">Zip Suite</h3>
+                </div>
+            </div>
+
+            <!-- SECRET TOOLS (Triggered by the top left Robot Icon) -->
+            <!-- CelebCall Prank Tool Hidden in Ghost Icon List -->
+            <div class="col-4 col-sm-3 tool-card-wrapper secret-tool d-none" data-name="celeb call fake video call prank celebrity beyonce drake taylor swift">
+                <div class="tool-card secret-style" onclick="requestAppLaunch('CelebCall_prank.html', this)">
+                    <div class="hot-badge"><i class="fa-solid fa-fire"></i> HOT</div>
+                    <img src="tools/img/celeb.png" class="app-logo" alt="Celeb Call" onerror="this.src='https://placehold.co/50x50/e2e8f0/64748b?text=Celeb';">
+                    <h3 class="tool-title">Celeb Call</h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper secret-tool d-none" data-name="character counter text words length">
+                <div class="tool-card secret-style" onclick="requestAppLaunch('character_counter.html', this)">
+                    <img src="tools/img/character_counter.png" class="app-logo" alt="Char Counter">
+                    <h3 class="tool-title">Cha.Counter</h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper secret-tool d-none" data-name="document processor editor text word pdf">
+                <div class="tool-card secret-style" onclick="requestAppLaunch('document_processor.html', this)">
+                    <img src="tools/img/document_processor.png" class="app-logo" alt="Doc Processor">
+                    <h3 class="tool-title">Doc Processor</h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper secret-tool d-none" data-name="frame me cl picture photo editor">
+                <div class="tool-card secret-style" onclick="requestAppLaunch('frame_me&cl.html', this)">
+                    <div class="hot-badge"><i class="fa-solid fa-fire"></i> HOT</div>
+                    <img src="tools/img/frame_me_cl.png" class="app-logo" alt="Frame Me CL">
+                    <h3 class="tool-title">Frame Me&CL</h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper secret-tool d-none" data-name="high speed were boy game play">
+                <div class="tool-card secret-style" onclick="requestAppLaunch('highSpeedWereBoy.html', this)">
+                    <div class="hot-badge"><i class="fa-solid fa-fire"></i> HOT</div>
+                    <img src="tools/img/wereboy.png" class="app-logo" alt="Were Boy">
+                    <h3 class="tool-title">High Speed Boy</h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper secret-tool d-none" data-name="metric mate measure calc">
+                <div class="tool-card secret-style" onclick="requestAppLaunch('metricMate.html', this)">
+                    <img src="tools/img/metricmate.png" class="app-logo" alt="Metric Mate">
+                    <h3 class="tool-title">Metric Mate</h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper secret-tool d-none" data-name="multibadest optimization tool data layout">
+                <div class="tool-card secret-style" onclick="requestAppLaunch('multibadest.html', this)">
+                    <div class="hot-badge"><i class="fa-solid fa-fire"></i> HOT</div>
+                    <img src="tools/img/multibadest.png" class="app-logo" alt="Multibadest">
+                    <h3 class="tool-title">Multibadest</h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper secret-tool d-none" data-name="fake notifications message alert simulator">
+                <div class="tool-card secret-style" onclick="requestAppLaunch('prank_Notification.html', this)">
+                    <div class="hot-badge"><i class="fa-solid fa-fire"></i> HOT</div>
+                    <img src="tools/img/prank_notification.png" class="app-logo" alt="Prank Notify">
+                    <h3 class="tool-title">Prank Notify</h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper secret-tool d-none" data-name="remote access protocol link system network">
+                <div class="tool-card secret-style border-danger" onclick="alert('You are not permitted to interact with the spyware for security reasons 🔐');">
+                    <img src="tools/img/remote.png" class="app-logo" alt="Remote Locked">
+                    <h3 class="tool-title text-danger">Remote Hub <i class="fa-solid fa-lock text-danger ms-1"></i></h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper secret-tool d-none" data-name="robo fake spoof calling console">
+                <div class="tool-card secret-style" onclick="requestAppLaunch('robo_call.html', this)">
+                    <div class="hot-badge"><i class="fa-solid fa-fire"></i> HOT</div>
+                    <img src="tools/img/robo_call.png" class="app-logo" alt="Robo Call">
+                    <h3 class="tool-title">Robo Call</h3>
+                </div>
+            </div>
+            <div class="col-4 col-sm-3 tool-card-wrapper secret-tool d-none" data-name="robo fake spoof calling console 2">
+                <div class="tool-card secret-style" onclick="requestAppLaunch('robo_call2.html', this)">
+                    <div class="hot-badge"><i class="fa-solid fa-fire"></i> HOT</div>
+                    <img src="tools/img/robo_call.png" class="app-logo" alt="Robo Call 2">
+                    <h3 class="tool-title">Robo Call 2</h3>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal fade" id="adInterstitialModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-sm px-4">
+            <div class="modal-content custom-modal-content p-4">
+                <div class="mb-3"><i class="fa-solid fa-rocket fa-2x" style="color: var(--primary-accent);"></i></div>
+                <h5 class="fw-bold mb-1 text-dark">Opening Module...</h5>
+                <p class="text-muted small mb-3">Loading resources (<span id="adTimer" class="fw-bold" style="color: var(--primary-accent);">4</span>s)</p>
+                <div class="custom-progress-track">
+                    <div id="adProgressBar" class="custom-progress-bar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="adminPortalBadge" class="admin-floating-trigger" onclick="location.href='tools/admin_dashboard.html'">
+        <i class="fa-solid fa-user-shield"></i>
+    </div>
+
+    <!-- Premium Glowing Mobile App Footer -->
+    <footer class="pro-footer">
+        <a href="#" class="footer-icon active" onclick="window.scrollTo(0,0); return false;">
+            <i class="fa-solid fa-layer-group"></i>
+            <span>Hub</span>
+        </a>
+        <a href="#" class="footer-icon" onclick="document.getElementById('toolSearch').focus(); window.scrollTo(0,0); return false;">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <span>Search</span>
+        </a>
+        <a href="#" class="footer-icon" onclick="triggerSecuritySettingsReset(); return false;">
+            <i class="fa-solid fa-fingerprint"></i>
+            <span>Security</span>
+        </a>
+        <a href="tools/admin_dashboard.html" class="footer-icon" id="footerAdminLink" style="display: none;">
+            <i class="fa-solid fa-user-shield text-danger"></i>
+            <span class="text-danger">Admin</span>
+        </a>
+    </footer>
+
+    <audio id="clickSound" src="assets/click.mp3" preload="auto"></audio>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+
+    <script>
+        let tg = null;
+        if (window.Telegram && window.Telegram.WebApp) {
+            tg = window.Telegram.WebApp;
+            tg.ready();
+            tg.expand();
         }
-    </script>
 
-    <script type="module">
-        import * as THREE from 'three';
-
-        // --- 1. BASIC WORLD SETUP ---
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x111122); // Dark tactical indigo sky
-
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 1.6, 5); 
-        camera.rotation.order = 'YXZ';
-        scene.add(camera); 
-
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
-
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-        scene.add(ambientLight);
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.7);
-        directionalLight.position.set(5, 10, 7);
-        scene.add(directionalLight);
-
-        // Environment grid and a simple structure
-        const gridHelper = new THREE.GridHelper(60, 60, 0x444444, 0x222222);
-        scene.add(gridHelper);
+        let targetDestinationUrl = "";
+        let adModalInstance = null;
+        let canvas = null;
+        let ctx = null;
+        let isDrawingPattern = false;
+        let patternNodes = [];
+        let selectedPatternPath = [];
+        let isRegisteringPatternMode = false;
         
-        const obstacleMat = new THREE.MeshStandardMaterial({ color: 0x444444 });
-        const structure = new THREE.Mesh(new THREE.BoxGeometry(10, 4, 1), obstacleMat);
-        structure.position.set(0, 2, -10);
-        scene.add(structure);
-
-        // --- 2. THE WEAPON & HANDS (VIEW MODEL) SETUP ---
-        // Create a parent container for the whole view model (hands + gun)
-        const viewModelGroup = new THREE.Group();
-        camera.add(viewModelGroup); // Attached to camera
-
-        // Materials
-        const gunMat = new THREE.MeshStandardMaterial({ color: 0x2c3e50, roughness: 0.7 });
-        const metalMat = new THREE.MeshStandardMaterial({ color: 0x95a5a6, metalness: 0.8 });
-        // Use a desaturated dark orange/peach for armored tactical gloves
-        const gloveMat = new THREE.MeshStandardMaterial({ color: 0xb58f70, roughness: 1.0 });
-
-        // -- The Gun --
-        const gunBodyGeo = new THREE.BoxGeometry(0.06, 0.08, 0.35);
-        const gunBody = new THREE.Mesh(gunBodyGeo, gunMat);
-        gunBody.position.set(0, 0, -0.15); // Origin at back
-        viewModelGroup.add(gunBody);
-
-        const barrelGeo = new THREE.CylinderGeometry(0.015, 0.015, 0.2);
-        const barrel = new THREE.Mesh(barrelGeo, metalMat);
-        barrel.rotation.x = Math.PI / 2;
-        barrel.position.set(0, 0.01, -0.32);
-        viewModelGroup.add(barrel);
-
-        const flashGeo = new THREE.SphereGeometry(0.06, 8, 8);
-        const muzzleFlash = new THREE.Mesh(flashGeo, new THREE.MeshBasicMaterial({ color: 0xf1c40f }));
-        muzzleFlash.position.set(0, 0.01, -0.42);
-        muzzleFlash.visible = false;
-        viewModelGroup.add(muzzleFlash);
-
-        // -- The Hands (Gloves) --
-        const handGeo = new THREE.BoxGeometry(0.07, 0.07, 0.1);
-        
-        // Right hand (holding grip)
-        const rightHand = new THREE.Mesh(handGeo, gloveMat);
-        rightHand.position.set(0.03, -0.06, -0.05); // Offset to side/bottom
-        rightHand.rotation.x = 0.2; // slight angle
-        viewModelGroup.add(rightHand);
-
-        // Left hand (foregrip supporting underneath)
-        const leftHand = new THREE.Mesh(handGeo, gloveMat);
-        leftHand.position.set(0, -0.07, -0.22); // underneath the barrel
-        leftHand.rotation.x = -0.1;
-        viewModelGroup.add(leftHand);
-
-        // -- View Model Idle Positioning --
-        // Gun is centered horizontally (x=0), slightly down from camera center (y=-0.2)
-        // Adjust these numbers until the gun points exactly at the crosshair
-        const idleViewX = 0;
-        const idleViewY = -0.22;
-        const idleViewZ = -0.5; // distance from lens
-
-        viewModelGroup.position.set(idleViewX, idleViewY, idleViewZ);
-
-
-        // --- 3. MULTIPLAYER SETUP ---
-        const remotePlayerMesh = new THREE.Mesh(new THREE.BoxGeometry(1.2, 2, 1.2), new THREE.MeshStandardMaterial({ color: 0x00a8ff }));
-        remotePlayerMesh.position.y = -20; // Hide until connect
-        scene.add(remotePlayerMesh);
-
-        let peer = new Peer(); let connection = null;
-        const statusEl = document.getElementById('network-status');
-
-        peer.on('open', (id) => { statusEl.innerText = "Ready"; document.getElementById('my-id').innerText = id; });
-        document.getElementById('connect-btn').addEventListener('click', () => {
-            const targetId = document.getElementById('peer-id-input').value.trim();
-            if (targetId) { setupConnection(peer.connect(targetId)); }
-        });
-        peer.on('connection', (conn) => setupConnection(conn));
-
-        function setupConnection(conn) {
-            connection = conn;
-            connection.on('open', () => { statusEl.innerText = "Connected!"; remotePlayerMesh.position.y = 1; });
-            connection.on('data', (data) => {
-                if (data.type === 'move') { remotePlayerMesh.position.set(data.pos.x, data.pos.y, data.pos.z); remotePlayerMesh.rotation.y = data.rotY; }
-                if (data.type === 'hit') { document.body.style.backgroundColor = "rgba(255,0,0,0.5)"; setTimeout(() => document.body.style.backgroundColor = "#111", 70); }
-            });
-            connection.on('close', () => { statusEl.innerText = "Player Left"; remotePlayerMesh.position.y = -20; });
+        function safeGetStorage(key) {
+            try { return localStorage.getItem(key); } catch(e) { return null; }
+        }
+        function safeSetStorage(key, value) {
+            try { localStorage.setItem(key, value); } catch(e) {}
+        }
+        function safeRemoveStorage(key) {
+            try { localStorage.removeItem(key); } catch(e) {}
         }
 
+        const SUPABASE_URL = "https://cwkpircsbjusnvvjaybp.supabase.co"; 
+        const SUPABASE_ANON_KEY = "sb_publishable_R7jAQ8ef0TDejRZvEx01vA_8lFePNTD"; 
+        const MASTER_ADMIN_ID = 123456789; 
 
-        // --- 4. SHOOTING & RECOIL ---
-        const raycaster = new THREE.Raycaster();
-        const centerScreen = new THREE.Vector2(0, 0); 
-        let isRecoiling = false;
-
-        function shoot() {
-            if (isRecoiling) return;
-            muzzleFlash.visible = true;
-            setTimeout(() => { muzzleFlash.visible = false; }, 40);
-
-            // Trigger Recoil Animation using basic linear math
-            isRecoiling = true;
-            let kickback = 0.06; // kick backward
-            let flip = 0.04; // kick upward
-            
-            viewModelGroup.position.z += kickback;
-            viewModelGroup.position.y += flip;
-            
-            // Linear recovery after 110ms
-            setTimeout(() => {
-                viewModelGroup.position.y -= flip;
-                viewModelGroup.position.z -= kickback;
-                isRecoiling = false;
-            }, 110);
-
-            // Network Raycast
-            raycaster.setFromCamera(centerScreen, camera);
-            if (raycaster.intersectObject(remotePlayerMesh).length > 0) {
-                remotePlayerMesh.material.color.setHex(0xff4757); // Flash red on our screen
-                setTimeout(() => remotePlayerMesh.material.color.setHex(0x00a8ff), 120);
-                if (connection && connection.open) connection.send({ type: 'hit' });
+        let supabaseClient = null;
+        try {
+            if (SUPABASE_URL !== "https://cwkpircsbjusnvvjaybp.supabase.co/functions/v1/super-handler" && window.supabase) {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             }
+        } catch(e) {
+            console.warn("Supabase backup active.");
         }
 
-
-        // --- 5. TOUCH INPUT CONTROLS ---
-        const moveInput = { x: 0, y: 0 }; const moveSpeed = 0.085; const lookSensitivity = 0.0055;
-        let joystickTouchId = null; let lookTouchId = null;
-        let lastLookTouchX = 0; let lastLookTouchY = 0;
-
-        const joystickZone = document.getElementById('joystick-zone');
-        const joystickKnob = document.getElementById('joystick-knob');
-        const joystickRect = joystickZone.getBoundingClientRect();
-        const joystickCenter = { x: joystickRect.left + joystickRect.width/2, y: joystickRect.top + joystickRect.height/2 };
-
-        window.addEventListener('touchstart', (e) => {
-            for (let i = 0; i < e.changedTouches.length; i++) {
-                const touch = e.changedTouches[i];
-                if (touch.target === document.getElementById('fire-button')) { shoot(); continue; }
-                const dx = touch.clientX - joystickCenter.x; const dy = touch.clientY - joystickCenter.y;
-                if (Math.sqrt(dx*dx + dy*dy) < 80 && joystickTouchId === null) { joystickTouchId = touch.identifier; handleJoystickMove(touch); }
-                else if (lookTouchId === null) { lookTouchId = touch.identifier; lastLookTouchX = touch.clientX; lastLookTouchY = touch.clientY; }
-            }
-        }, { passive: false });
-
-        window.addEventListener('touchmove', (e) => {
-            for (let i = 0; i < e.changedTouches.length; i++) {
-                const touch = e.changedTouches[i];
-                if (touch.identifier === joystickTouchId) handleJoystickMove(touch);
-                if (touch.identifier === lookTouchId) handleLookMove(touch);
-            }
-        }, { passive: false });
-
-        window.addEventListener('touchend', (e) => {
-            for (let i = 0; i < e.changedTouches.length; i++) {
-                const touch = e.changedTouches[i];
-                if (touch.identifier === joystickTouchId) { joystickTouchId = null; moveInput.x = 0; moveInput.y = 0; joystickKnob.style.transform = `translate(0px, 0px)`; }
-                if (touch.identifier === lookTouchId) lookTouchId = null;
-            }
-        });
-
-        function handleJoystickMove(touch) {
-            let dx = touch.clientX - joystickCenter.x; let dy = touch.clientY - joystickCenter.y;
-            const dist = Math.sqrt(dx*dx + dy*dy); const maxRad = 40;
-            if (dist > maxRad) { dx = (dx/dist)*maxRad; dy = (dy/dist)*maxRad; }
-            joystickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
-            moveInput.x = dx / maxRad; moveInput.y = dy / maxRad;
-        }
-
-        function handleLookMove(touch) {
-            const dx = touch.clientX - lastLookTouchX; const dy = touch.clientY - lastLookTouchY;
-            camera.rotation.y -= dx * lookSensitivity; camera.rotation.x -= dy * lookSensitivity;
-            camera.rotation.x = Math.max(-Math.PI/2.2, Math.min(Math.PI/2.2, camera.rotation.x));
-            lastLookTouchX = touch.clientX; lastLookTouchY = touch.clientY;
-        }
-
-
-        // --- 6. GAME ENGINE LOOP ---
-        let networkTick = 0;
-        let walkCycle = 0; // Tracks walk cycle time for bobbing sine wave
-        const clock = new THREE.Clock(); // Required to track precise time between frames
-
-        function animate() {
-            requestAnimationFrame(animate);
-            const deltaTime = clock.getDelta(); // Time elapsed since last frame
-            
-            const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
-            const right = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
-            forward.y = 0; right.y = 0; forward.normalize(); right.normalize();
-
-            let isMoving = false;
-            if (moveInput.x !== 0 || moveInput.y !== 0) {
-                camera.position.addScaledVector(forward, -moveInput.y * moveSpeed);
-                camera.position.addScaledVector(right, moveInput.x * moveSpeed);
-                isMoving = true;
+        function initAppEnvironment() {
+            canvas = document.getElementById("patternCanvas");
+            if (canvas) {
+                ctx = canvas.getContext("2d");
+                initializePatternNodesArray();
+                setupPatternDrawTouchListeners();
             }
 
-            // --- PROCEDURAL WALK BOBBING ANIMATION (sine waves) ---
-            const bobFrequency = 11; // Cycles per second (speed of steps)
-            const bobAmountY = 0.005; // Up/down amplitude
-            const bobAmountX = 0.003; // Slight side-to-side shift
+            try {
+                if (typeof bootstrap !== 'undefined') {
+                    const modalEl = document.getElementById('adInterstitialModal');
+                    if (modalEl) adModalInstance = new bootstrap.Modal(modalEl);
+                }
+            } catch(e) {
+                console.warn("Bootstrap framework load status inactive.");
+            }
 
-            let targetBobY = idleViewY;
-            let targetBobX = idleViewX;
+            const searchInput = document.getElementById('toolSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    const query = e.target.value.toLowerCase().trim();
+                    document.querySelectorAll('.tool-card-wrapper').forEach(wrap => {
+                        wrap.style.display = wrap.getAttribute('data-name').includes(query) ? 'block' : 'none';
+                    });
+                });
+            }
 
-            if (isMoving) {
-                walkCycle += deltaTime * bobFrequency;
-                // Vertical Bob (Up and Down sine wave)
-                targetBobY += Math.sin(walkCycle) * bobAmountY;
-                // Horizontal Sway (Side to side cosine wave at half frequency)
-                targetBobX += Math.cos(walkCycle / 2) * bobAmountX;
+            const ogTrigger = document.getElementById('ogSecretTrigger');
+            if (ogTrigger) {
+                ogTrigger.addEventListener('click', function() {
+                    const secretTools = document.querySelectorAll('.secret-tool');
+                    if (secretTools.length === 0) return;
+                    const isHidden = secretTools[0].classList.contains('d-none');
+                    
+                    secretTools.forEach(tool => {
+                        if (isHidden) tool.classList.remove('d-none'); else tool.classList.add('d-none');
+                    });
+
+                    this.style.transform = isHidden ? "scale(1.2) rotate(360deg)" : "scale(1) rotate(0deg)";
+                    this.style.filter = isHidden ? "drop-shadow(0 0 12px #3b82f6)" : "none";
+                });
+            }
+
+            if (tg) {
+                try {
+                    const sessionUser = tg.initDataUnsafe ? tg.initDataUnsafe.user : null;
+                    if (sessionUser) {
+                        const handle = sessionUser.username ? `@${sessionUser.username}` : (sessionUser.first_name || 'User');
+                        document.getElementById('userProfileDisplay').innerHTML = `<i class="fa-solid fa-user me-1"></i> ${handle}`;
+                        syncSessionWithSupabase(sessionUser);
+                        if (sessionUser.id === MASTER_ADMIN_ID) {
+                            const adminBadge = document.getElementById('adminPortalBadge');
+                            if (adminBadge) adminBadge.style.display = 'flex';
+                            
+                            const footerAdminLink = document.getElementById('footerAdminLink');
+                            if (footerAdminLink) footerAdminLink.style.display = 'flex';
+                        }
+                    } else {
+                        document.getElementById('userProfileDisplay').innerHTML = `<i class="fa-solid fa-user-secret me-1"></i> Guest`;
+                    }
+                } catch (e) {
+                    document.getElementById('userProfileDisplay').innerHTML = `<i class="fa-solid fa-triangle-exclamation text-danger me-1"></i> TG Error`;
+                }
             } else {
-                // Quickly lerp (reset) back to exact center if stopped
-                walkCycle = 0; 
+                document.getElementById('userProfileDisplay').innerHTML = `<i class="fa-solid fa-laptop"></i> Local Mode`;
             }
 
-            // Apply calculated bobbing position to the view model group,
-            // unless we are currently recoiling from a shot.
-            if (!isRecoiling) {
-                // Apply subtle lerping to smooth the transition
-                viewModelGroup.position.y = THREE.MathUtils.lerp(viewModelGroup.position.y, targetBobY, 0.2);
-                viewModelGroup.position.x = THREE.MathUtils.lerp(viewModelGroup.position.x, targetBobX, 0.2);
-            }
-
-            // Network Sync (30 Hz)
-            networkTick++;
-            if (networkTick % 2 === 0 && connection && connection.open) {
-                connection.send({ type: 'move', pos: { x: camera.position.x, y: camera.position.y - 0.6, z: camera.position.z }, rotY: camera.rotation.y });
-            }
-
-            renderer.render(scene, camera);
+            setTimeout(() => {
+                const splash = document.getElementById('splashLayer');
+                if (splash) {
+                    splash.style.transition = 'opacity 0.4s ease';
+                    splash.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        splash.style.display = 'none';
+                        evaluateEcosystemSecurityAccessGate();
+                    }, 400); 
+                }
+            }, 1500);
         }
 
-        window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
-        animate();
+        if (document.readyState === 'loading') {
+            document.addEventListener("DOMContentLoaded", initAppEnvironment);
+        } else {
+            initAppEnvironment();
+        }
+
+        function evaluateEcosystemSecurityAccessGate() {
+            const chosenMethod = safeGetStorage("chosen_security_method");
+            
+            if (!chosenMethod) {
+                document.getElementById('securityOnboardingLayer').style.display = 'flex';
+            } else {
+                if (chosenMethod === 'fingerprint') {
+                    document.getElementById('fingerprintLockLayer').style.display = 'flex';
+                } else if (chosenMethod === 'pattern') {
+                    isRegisteringPatternMode = false;
+                    document.getElementById('patternLockHeader').innerText = "Unlock Terminal";
+                    document.getElementById('patternLockSubheader').innerText = "Reconstruct system access matrix path link";
+                    document.getElementById('patternLockLayer').style.display = 'flex';
+                    renderPatternCanvasLoop();
+                }
+            }
+        }
+
+        function setupOnboardingSecurity(selectedType) {
+            if (selectedType === 'fingerprint') {
+                safeSetStorage("chosen_security_method", "fingerprint");
+                document.getElementById('securityOnboardingLayer').style.display = 'none';
+                evaluateEcosystemSecurityAccessGate();
+            } else if (selectedType === 'pattern') {
+                isRegisteringPatternMode = true;
+                document.getElementById('securityOnboardingLayer').style.display = 'none';
+                document.getElementById('patternLockHeader').innerText = "Register Signature";
+                document.getElementById('patternLockSubheader').innerText = "Link at least 3 grid nodes sequentially";
+                document.getElementById('patternLockLayer').style.display = 'flex';
+                renderPatternCanvasLoop();
+            }
+        }
+
+        async function authenticateViaBiometrics() {
+            const feedback = document.getElementById("biometricStatusFeedback");
+            feedback.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin me-1"></i> Reading biometric terminal node...`;
+
+            setTimeout(() => {
+                feedback.innerHTML = `<i class="fa-solid fa-circle-check text-success me-1"></i> Access cleared. Matrix open.`;
+                feedback.style.color = "#10b981"; 
+                setTimeout(() => {
+                    document.getElementById('fingerprintLockLayer').style.display = 'none';
+                }, 800);
+            }, 1400);
+        }
+
+        function triggerSecuritySettingsReset() {
+            if (confirm("Reset current configuration parameters and clear access lock presets from this terminal framework layer completely?")) {
+                safeRemoveStorage("chosen_security_method");
+                safeRemoveStorage("terminal_security_pattern_signature");
+                alert("Matrix parameters purged. Reloading workspace deck...");
+                location.reload();
+            }
+        }
+
+        function initializePatternNodesArray() {
+            patternNodes = [];
+            const spaceBetween = 260 / 4;
+            for (let row = 1; row <= 3; row++) {
+                for (let col = 1; col <= 3; col++) {
+                    patternNodes.push({ id: (row-1)*3 + col, x: col * spaceBetween, y: row * spaceBetween, radius: 10 });
+                }
+            }
+        }
+
+        function renderPatternCanvasLoop() {
+            if (!ctx) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (selectedPatternPath.length > 0) {
+                ctx.beginPath();
+                ctx.strokeStyle = "#3b82f6";
+                ctx.lineWidth = 4;
+                ctx.lineJoin = "round";
+                
+                let startNode = patternNodes.find(n => n.id === selectedPatternPath[0]);
+                ctx.moveTo(startNode.x, startNode.y);
+                
+                for (let i = 1; i < selectedPatternPath.length; i++) {
+                    let nextNode = patternNodes.find(n => n.id === selectedPatternPath[i]);
+                    ctx.lineTo(nextNode.x, nextNode.y);
+                }
+                ctx.stroke();
+            }
+
+            patternNodes.forEach(node => {
+                ctx.beginPath();
+                let isSelected = selectedPatternPath.includes(node.id);
+                ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+                ctx.fillStyle = isSelected ? "#2563eb" : "#f1f5f9";
+                ctx.fill();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = isSelected ? "#ffffff" : "#cbd5e1";
+                ctx.stroke();
+            });
+        }
+
+        function setupPatternDrawTouchListeners() {
+            if (!canvas) return;
+            const startDraw = (e) => { e.preventDefault(); isDrawingPattern = true; selectedPatternPath = []; processActiveMovementCoordinates(e); };
+            const moveDraw = (e) => { if (!isDrawingPattern) return; e.preventDefault(); processActiveMovementCoordinates(e); renderPatternCanvasLoop(); };
+            const endDraw = (e) => { if (!isDrawingPattern) return; isDrawingPattern = false; finalizePatternSignatureProcessingSequence(); };
+
+            canvas.addEventListener("mousedown", startDraw);
+            canvas.addEventListener("mousemove", moveDraw);
+            canvas.addEventListener("mouseup", endDraw);
+
+            canvas.addEventListener("touchstart", startDraw, {passive: false});
+            canvas.addEventListener("touchmove", moveDraw, {passive: false});
+            canvas.addEventListener("touchend", endDraw, {passive: false});
+        }
+
+        function processActiveMovementCoordinates(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            const currentX = clientX - rect.left;
+            const currentY = clientY - rect.top;
+
+            patternNodes.forEach(node => {
+                const distance = Math.hypot(node.x - currentX, node.y - currentY);
+                if (distance < node.radius + 15) { 
+                    if (!selectedPatternPath.includes(node.id)) {
+                        selectedPatternPath.push(node.id);
+                    }
+                }
+            });
+        }
+
+        function resetPatternRegistrationState() {
+            selectedPatternPath = [];
+            renderPatternCanvasLoop();
+        }
+
+        function finalizePatternSignatureProcessingSequence() {
+            const generatedSignature = selectedPatternPath.join("-");
+            if (selectedPatternPath.length < 3) {
+                alert("Connection path signature too small. Register minimum of 3 nodes.");
+                resetPatternRegistrationState();
+                return;
+            }
+
+            if (isRegisteringPatternMode) {
+                safeSetStorage("terminal_security_pattern_signature", generatedSignature);
+                safeSetStorage("chosen_security_method", "pattern");
+                alert("Terminal lock preset assignment complete.");
+                document.getElementById('patternLockLayer').style.display = 'none';
+            } else {
+                const archivedSignature = safeGetStorage("terminal_security_pattern_signature");
+                if (generatedSignature === archivedSignature) {
+                    document.getElementById('patternLockLayer').style.display = 'none';
+                } else {
+                    alert("Invalid signature structure coordinate sequence.");
+                    resetPatternRegistrationState();
+                }
+            }
+        }
+
+        async function syncSessionWithSupabase(userData) {
+            if (!supabaseClient || !userData.id) return;
+            try {
+                await supabaseClient.from('users').upsert({
+                    telegram_id: userData.id,
+                    username: userData.username || null,
+                    first_name: userData.first_name || 'User',
+                    last_name: userData.last_name || null,
+                    last_seen_at: new Date().toISOString()
+                }, { onConflict: 'telegram_id' });
+            } catch (err) { 
+                console.warn("Supabase cloud transaction interface offline."); 
+            }
+        }
+
+        function requestAppLaunch(destinationUrl, element) {
+            targetDestinationUrl = destinationUrl;
+            
+            if (element) {
+                element.classList.add('pop-click');
+                setTimeout(() => {
+                    element.classList.remove('pop-click');
+                }, 350); 
+            }
+
+            try { document.getElementById('clickSound').play(); } catch(e){}
+            const progressBar = document.getElementById('adProgressBar');
+            const timerText = document.getElementById('adTimer');
+            if(progressBar) progressBar.style.width = "0%";
+            
+            let remainingSeconds = 4;
+            if(timerText) timerText.innerText = remainingSeconds;
+            
+            setTimeout(() => {
+                if (adModalInstance) {
+                    adModalInstance.show();
+                } else {
+                    const fallbackModal = document.getElementById('adInterstitialModal');
+                    if (fallbackModal) {
+                        fallbackModal.style.display = 'block';
+                        fallbackModal.style.backgroundColor = 'rgba(255,255,255,0.85)';
+                        fallbackModal.classList.add('show');
+                    }
+                }
+
+                const intervalSequence = setInterval(() => {
+                    remainingSeconds--;
+                    if(progressBar) progressBar.style.width = `${((4 - remainingSeconds) / 4) * 100}%`;
+                    
+                    if (remainingSeconds <= 0) {
+                        clearInterval(intervalSequence);
+                        if (adModalInstance) {
+                            adModalInstance.hide();
+                        } else {
+                            const fallbackModal = document.getElementById('adInterstitialModal');
+                            if(fallbackModal) {
+                                fallbackModal.style.display = 'none';
+                                fallbackModal.classList.remove('show');
+                            }
+                        }
+                        window.location.href = `tools/${targetDestinationUrl}`;
+                    } else {
+                        if(timerText) timerText.innerText = remainingSeconds;
+                    }
+                }, 1000);
+            }, 300);
+        }
     </script>
 </body>
 </html>
